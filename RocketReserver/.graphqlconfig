@@ -1,0 +1,15 @@
+{
+  "name": "",
+  "schemaPath": "./gql/LaunchList.graphql",
+  "extensions": {
+    "endpoints": {
+      "Code Sandbox": {
+        "url": "https://n1kqy.sse.codesandbox.io/graphql",
+        "headers": {
+          "user-agent": "Apollo iOS"
+        },
+        "introspect": false
+      }
+    }
+  }
+}

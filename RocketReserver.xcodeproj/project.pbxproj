@@ -15,6 +15,7 @@
 		DC301F7923B9DBFB00E98C2D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DC301F7723B9DBFB00E98C2D /* LaunchScreen.storyboard */; };
 		DC301F8723B9DFBB00E98C2D /* ApolloWebSocket in Frameworks */ = {isa = PBXBuildFile; productRef = DC301F8623B9DFBB00E98C2D /* ApolloWebSocket */; };
 		DC301F8923B9DFBB00E98C2D /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = DC301F8823B9DFBB00E98C2D /* Apollo */; };
+		DC301F8F23B9E29900E98C2D /* LaunchList.graphql in Resources */ = {isa = PBXBuildFile; fileRef = DC301F8E23B9E29900E98C2D /* LaunchList.graphql */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,8 @@
 		DC301F7523B9DBFB00E98C2D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		DC301F7823B9DBFB00E98C2D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DC301F7A23B9DBFB00E98C2D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DC301F8B23B9E1F100E98C2D /* schema.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = schema.json; sourceTree = "<group>"; };
+		DC301F8E23B9E29900E98C2D /* LaunchList.graphql */ = {isa = PBXFileReference; lastKnownFileType = text; path = LaunchList.graphql; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +63,8 @@
 		DC301F6B23B9DBFB00E98C2D /* RocketReserver */ = {
 			isa = PBXGroup;
 			children = (
+				DC301F8D23B9E26E00E98C2D /* gql */,
+				DC301F8B23B9E1F100E98C2D /* schema.json */,
 				DC301F6C23B9DBFB00E98C2D /* AppDelegate.swift */,
 				DC301F6E23B9DBFB00E98C2D /* SceneDelegate.swift */,
 				DC301F7023B9DBFB00E98C2D /* ContentView.swift */,
@@ -77,6 +82,14 @@
 				DC301F7523B9DBFB00E98C2D /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		DC301F8D23B9E26E00E98C2D /* gql */ = {
+			isa = PBXGroup;
+			children = (
+				DC301F8E23B9E29900E98C2D /* LaunchList.graphql */,
+			);
+			path = gql;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -147,6 +160,7 @@
 			files = (
 				DC301F7923B9DBFB00E98C2D /* LaunchScreen.storyboard in Resources */,
 				DC301F7623B9DBFB00E98C2D /* Preview Assets.xcassets in Resources */,
+				DC301F8F23B9E29900E98C2D /* LaunchList.graphql in Resources */,
 				DC301F7323B9DBFB00E98C2D /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
