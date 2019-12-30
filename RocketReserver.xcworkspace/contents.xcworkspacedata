@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <Group
+      location = "group:"
+      name = "LocalServer">
+      <FileRef
+         location = "group:server/README.md">
+      </FileRef>
+      <FileRef
+         location = "group:server/apollo.config.js">
+      </FileRef>
+      <FileRef
+         location = "group:server/now.json">
+      </FileRef>
+      <FileRef
+         location = "group:server/package.json">
+      </FileRef>
+      <Group
+         location = "group:server/src"
+         name = "src">
+         <Group
+            location = "group:datasources"
+            name = "datasources">
+            <FileRef
+               location = "group:user.js">
+            </FileRef>
+            <Group
+               location = "group:__tests__"
+               name = "__tests__">
+               <FileRef
+                  location = "group:user.js">
+               </FileRef>
+               <FileRef
+                  location = "group:launch.js">
+               </FileRef>
+            </Group>
+            <FileRef
+               location = "group:launch.js">
+            </FileRef>
+         </Group>
+         <FileRef
+            location = "group:resolvers.js">
+         </FileRef>
+         <FileRef
+            location = "group:index.js">
+         </FileRef>
+         <Group
+            location = "group:__tests__"
+            name = "__tests__">
+            <FileRef
+               location = "group:resolvers.query.js">
+            </FileRef>
+            <FileRef
+               location = "group:__utils.js">
+            </FileRef>
+            <FileRef
+               location = "group:resolvers.mission.js">
+            </FileRef>
+            <FileRef
+               location = "group:resolvers.mutation.js">
+            </FileRef>
+            <FileRef
+               location = "group:e2e.js">
+            </FileRef>
+            <FileRef
+               location = "group:resolvers.user.js">
+            </FileRef>
+            <FileRef
+               location = "group:integration.js">
+            </FileRef>
+            <Group
+               location = "group:__snapshots__"
+               name = "__snapshots__">
+               <FileRef
+                  location = "group:integration.js.snap">
+               </FileRef>
+               <FileRef
+                  location = "group:e2e.js.snap">
+               </FileRef>
+            </Group>
+         </Group>
+         <FileRef
+            location = "group:schema.js">
+         </FileRef>
+         <FileRef
+            location = "group:utils.js">
+         </FileRef>
+         <FileRef
+            location = "group:engine-demo.js">
+         </FileRef>
+      </Group>
+   </Group>
+   <FileRef
+      location = "container:RocketReserver.xcodeproj">
+   </FileRef>
+</Workspace>
