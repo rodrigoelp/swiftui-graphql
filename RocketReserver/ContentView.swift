@@ -10,40 +10,43 @@ private let dateFormatter: DateFormatter = {
 }()
 
 struct ContentView: View {
-    @State private var dates = [Date]()
+    @EnvironmentObject var dataStore: DataStore
 
     var body: some View {
         NavigationView {
-            MasterView(dates: $dates)
-                .navigationBarTitle(Text("Master"))
+            MasterView(launches: $dataStore.launches)
+                .navigationBarTitle(Text("Launches"))
                 .navigationBarItems(
                     leading: EditButton(),
                     trailing: Button(
                         action: {
-                            withAnimation { self.dates.insert(Date(), at: 0) }
+//                            withAnimation { self.dates.insert(Date(), at: 0) }
                         }
                     ) {
                         Image(systemName: "plus")
                     }
                 )
             DetailView()
+        }.onAppear {
+            self.dataStore.loadLaunches() // this might be a problem later on...
         }.navigationViewStyle(DoubleColumnNavigationViewStyle())
     }
 }
 
 struct MasterView: View {
-    @Binding var dates: [Date]
+    @Binding var launches: [LaunchListQuery.Data.Launch.Launch]
 
     var body: some View {
         List {
-            ForEach(dates, id: \.self) { date in
-                NavigationLink(
-                    destination: DetailView(selectedDate: date)
-                ) {
-                    Text("\(date, formatter: dateFormatter)")
-                }
+            ForEach(launches) { item in
+                Text(item.site ?? "")
+//                NavigationLink(
+//                    destination: DetailView(selectedDate: date)
+//                ) {
+//                    Text("\(date, formatter: dateFormatter)")
+//                }
             }.onDelete { indices in
-                indices.forEach { self.dates.remove(at: $0) }
+//                indices.forEach { self.dates.remove(at: $0) }
             }
         }
     }

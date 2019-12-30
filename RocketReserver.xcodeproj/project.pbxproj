@@ -18,6 +18,8 @@
 		DC301F8F23B9E29900E98C2D /* LaunchList.graphql in Resources */ = {isa = PBXBuildFile; fileRef = DC301F8E23B9E29900E98C2D /* LaunchList.graphql */; };
 		DC301F9123B9E45A00E98C2D /* GraphQL.Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC301F9023B9E45A00E98C2D /* GraphQL.Models.swift */; };
 		DC301F9323B9E4C800E98C2D /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC301F9223B9E4C800E98C2D /* Network.swift */; };
+		DC301F9523B9E85C00E98C2D /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC301F9423B9E85C00E98C2D /* DataStore.swift */; };
+		DC301F9723B9EAF000E98C2D /* GraphQL.Models.Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC301F9623B9EAF000E98C2D /* GraphQL.Models.Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +35,8 @@
 		DC301F8E23B9E29900E98C2D /* LaunchList.graphql */ = {isa = PBXFileReference; lastKnownFileType = text; path = LaunchList.graphql; sourceTree = "<group>"; };
 		DC301F9023B9E45A00E98C2D /* GraphQL.Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphQL.Models.swift; sourceTree = "<group>"; };
 		DC301F9223B9E4C800E98C2D /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
+		DC301F9423B9E85C00E98C2D /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
+		DC301F9623B9EAF000E98C2D /* GraphQL.Models.Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphQL.Models.Extensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,11 +77,13 @@
 				DC301F6E23B9DBFB00E98C2D /* SceneDelegate.swift */,
 				DC301F7023B9DBFB00E98C2D /* ContentView.swift */,
 				DC301F9023B9E45A00E98C2D /* GraphQL.Models.swift */,
+				DC301F9623B9EAF000E98C2D /* GraphQL.Models.Extensions.swift */,
 				DC301F7223B9DBFB00E98C2D /* Assets.xcassets */,
 				DC301F7723B9DBFB00E98C2D /* LaunchScreen.storyboard */,
 				DC301F7A23B9DBFB00E98C2D /* Info.plist */,
 				DC301F7423B9DBFB00E98C2D /* Preview Content */,
 				DC301F9223B9E4C800E98C2D /* Network.swift */,
+				DC301F9423B9E85C00E98C2D /* DataStore.swift */,
 			);
 			path = RocketReserver;
 			sourceTree = "<group>";
@@ -200,6 +206,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				DC301F9323B9E4C800E98C2D /* Network.swift in Sources */,
+				DC301F9723B9EAF000E98C2D /* GraphQL.Models.Extensions.swift in Sources */,
+				DC301F9523B9E85C00E98C2D /* DataStore.swift in Sources */,
 				DC301F9123B9E45A00E98C2D /* GraphQL.Models.swift in Sources */,
 				DC301F6D23B9DBFB00E98C2D /* AppDelegate.swift in Sources */,
 				DC301F6F23B9DBFB00E98C2D /* SceneDelegate.swift in Sources */,
