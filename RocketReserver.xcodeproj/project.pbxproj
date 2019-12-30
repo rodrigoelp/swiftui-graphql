@@ -55,7 +55,6 @@
 		DC301F6023B9DBFB00E98C2D = {
 			isa = PBXGroup;
 			children = (
-				DCCD349923BAC21300FC852D /* New Group */,
 				DC301F6B23B9DBFB00E98C2D /* RocketReserver */,
 				DC301F6A23B9DBFB00E98C2D /* Products */,
 			);
@@ -103,13 +102,6 @@
 				DC301F8E23B9E29900E98C2D /* LaunchList.graphql */,
 			);
 			path = gql;
-			sourceTree = "<group>";
-		};
-		DCCD349923BAC21300FC852D /* New Group */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "New Group";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
