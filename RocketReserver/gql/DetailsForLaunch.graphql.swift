@@ -249,34 +249,37 @@ public final class LaunchDetailsQuery: GraphQLQuery {
   }
 }
 
-public final class LaunchListQuery: GraphQLQuery {
+public final class LaunchDetailsWithFragmentsQuery: GraphQLQuery {
   /// The raw GraphQL definition of this operation.
   public let operationDefinition =
     """
-    query LaunchList {
-      launches {
+    query LaunchDetailsWithFragments($launchId: ID!) {
+      launch(id: $launchId) {
         __typename
-        cursor
-        hasMore
-        launches {
-          __typename
-          id
-          site
-        }
+        ...LaunchFragment
       }
     }
     """
 
-  public let operationName = "LaunchList"
+  public let operationName = "LaunchDetailsWithFragments"
 
-  public init() {
+  public var queryDocument: String { return operationDefinition.appending(LaunchFragment.fragmentDefinition).appending(MissionFragment.fragmentDefinition).appending(RocketFragment.fragmentDefinition) }
+
+  public var launchId: GraphQLID
+
+  public init(launchId: GraphQLID) {
+    self.launchId = launchId
+  }
+
+  public var variables: GraphQLMap? {
+    return ["launchId": launchId]
   }
 
   public struct Data: GraphQLSelectionSet {
     public static let possibleTypes = ["Query"]
 
     public static let selections: [GraphQLSelection] = [
-      GraphQLField("launches", type: .nonNull(.object(Launch.selections))),
+      GraphQLField("launch", arguments: ["id": GraphQLVariable("launchId")], type: .object(Launch.selections)),
     ]
 
     public private(set) var resultMap: ResultMap
@@ -285,37 +288,31 @@ public final class LaunchListQuery: GraphQLQuery {
       self.resultMap = unsafeResultMap
     }
 
-    public init(launches: Launch) {
-      self.init(unsafeResultMap: ["__typename": "Query", "launches": launches.resultMap])
+    public init(launch: Launch? = nil) {
+      self.init(unsafeResultMap: ["__typename": "Query", "launch": launch.flatMap { (value: Launch) -> ResultMap in value.resultMap }])
     }
 
-    public var launches: Launch {
+    public var launch: Launch? {
       get {
-        return Launch(unsafeResultMap: resultMap["launches"]! as! ResultMap)
+        return (resultMap["launch"] as? ResultMap).flatMap { Launch(unsafeResultMap: $0) }
       }
       set {
-        resultMap.updateValue(newValue.resultMap, forKey: "launches")
+        resultMap.updateValue(newValue?.resultMap, forKey: "launch")
       }
     }
 
     public struct Launch: GraphQLSelectionSet {
-      public static let possibleTypes = ["LaunchConnection"]
+      public static let possibleTypes = ["Launch"]
 
       public static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
-        GraphQLField("cursor", type: .nonNull(.scalar(String.self))),
-        GraphQLField("hasMore", type: .nonNull(.scalar(Bool.self))),
-        GraphQLField("launches", type: .nonNull(.list(.object(Launch.selections)))),
+        GraphQLFragmentSpread(LaunchFragment.self),
       ]
 
       public private(set) var resultMap: ResultMap
 
       public init(unsafeResultMap: ResultMap) {
         self.resultMap = unsafeResultMap
-      }
-
-      public init(cursor: String, hasMore: Bool, launches: [Launch?]) {
-        self.init(unsafeResultMap: ["__typename": "LaunchConnection", "cursor": cursor, "hasMore": hasMore, "launches": launches.map { (value: Launch?) -> ResultMap? in value.flatMap { (value: Launch) -> ResultMap in value.resultMap } }])
       }
 
       public var __typename: String {
@@ -327,76 +324,28 @@ public final class LaunchListQuery: GraphQLQuery {
         }
       }
 
-      public var cursor: String {
+      public var fragments: Fragments {
         get {
-          return resultMap["cursor"]! as! String
+          return Fragments(unsafeResultMap: resultMap)
         }
         set {
-          resultMap.updateValue(newValue, forKey: "cursor")
+          resultMap += newValue.resultMap
         }
       }
 
-      public var hasMore: Bool {
-        get {
-          return resultMap["hasMore"]! as! Bool
-        }
-        set {
-          resultMap.updateValue(newValue, forKey: "hasMore")
-        }
-      }
-
-      public var launches: [Launch?] {
-        get {
-          return (resultMap["launches"] as! [ResultMap?]).map { (value: ResultMap?) -> Launch? in value.flatMap { (value: ResultMap) -> Launch in Launch(unsafeResultMap: value) } }
-        }
-        set {
-          resultMap.updateValue(newValue.map { (value: Launch?) -> ResultMap? in value.flatMap { (value: Launch) -> ResultMap in value.resultMap } }, forKey: "launches")
-        }
-      }
-
-      public struct Launch: GraphQLSelectionSet {
-        public static let possibleTypes = ["Launch"]
-
-        public static let selections: [GraphQLSelection] = [
-          GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
-          GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
-          GraphQLField("site", type: .scalar(String.self)),
-        ]
-
+      public struct Fragments {
         public private(set) var resultMap: ResultMap
 
         public init(unsafeResultMap: ResultMap) {
           self.resultMap = unsafeResultMap
         }
 
-        public init(id: GraphQLID, site: String? = nil) {
-          self.init(unsafeResultMap: ["__typename": "Launch", "id": id, "site": site])
-        }
-
-        public var __typename: String {
+        public var launchFragment: LaunchFragment {
           get {
-            return resultMap["__typename"]! as! String
+            return LaunchFragment(unsafeResultMap: resultMap)
           }
           set {
-            resultMap.updateValue(newValue, forKey: "__typename")
-          }
-        }
-
-        public var id: GraphQLID {
-          get {
-            return resultMap["id"]! as! GraphQLID
-          }
-          set {
-            resultMap.updateValue(newValue, forKey: "id")
-          }
-        }
-
-        public var site: String? {
-          get {
-            return resultMap["site"] as? String
-          }
-          set {
-            resultMap.updateValue(newValue, forKey: "site")
+            resultMap += newValue.resultMap
           }
         }
       }
@@ -404,14 +353,14 @@ public final class LaunchListQuery: GraphQLQuery {
   }
 }
 
-public struct MissionInfo: GraphQLFragment {
+public struct MissionFragment: GraphQLFragment {
   /// The raw GraphQL definition of this fragment.
   public static let fragmentDefinition =
     """
-    fragment MissionInfo on Mission {
+    fragment MissionFragment on Mission {
       __typename
       name
-      missionPatch
+      missionPatch(size: SMALL)
     }
     """
 
@@ -420,7 +369,7 @@ public struct MissionInfo: GraphQLFragment {
   public static let selections: [GraphQLSelection] = [
     GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
     GraphQLField("name", type: .scalar(String.self)),
-    GraphQLField("missionPatch", type: .scalar(String.self)),
+    GraphQLField("missionPatch", arguments: ["size": "SMALL"], type: .scalar(String.self)),
   ]
 
   public private(set) var resultMap: ResultMap
@@ -461,11 +410,11 @@ public struct MissionInfo: GraphQLFragment {
   }
 }
 
-public struct RocketInfo: GraphQLFragment {
+public struct RocketFragment: GraphQLFragment {
   /// The raw GraphQL definition of this fragment.
   public static let fragmentDefinition =
     """
-    fragment RocketInfo on Rocket {
+    fragment RocketFragment on Rocket {
       __typename
       id
       name
@@ -529,22 +478,22 @@ public struct RocketInfo: GraphQLFragment {
   }
 }
 
-public struct LaunchInfo: GraphQLFragment {
+public struct LaunchFragment: GraphQLFragment {
   /// The raw GraphQL definition of this fragment.
   public static let fragmentDefinition =
     """
-    fragment LaunchInfo on Launch {
+    fragment LaunchFragment on Launch {
       __typename
       id
       site
       isBooked
       mission {
         __typename
-        ...MissionInfo
+        ...MissionFragment
       }
       rocket {
         __typename
-        ...RocketInfo
+        ...RocketFragment
       }
     }
     """
@@ -629,7 +578,7 @@ public struct LaunchInfo: GraphQLFragment {
 
     public static let selections: [GraphQLSelection] = [
       GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
-      GraphQLFragmentSpread(MissionInfo.self),
+      GraphQLFragmentSpread(MissionFragment.self),
     ]
 
     public private(set) var resultMap: ResultMap
@@ -667,9 +616,9 @@ public struct LaunchInfo: GraphQLFragment {
         self.resultMap = unsafeResultMap
       }
 
-      public var missionInfo: MissionInfo {
+      public var missionFragment: MissionFragment {
         get {
-          return MissionInfo(unsafeResultMap: resultMap)
+          return MissionFragment(unsafeResultMap: resultMap)
         }
         set {
           resultMap += newValue.resultMap
@@ -683,7 +632,7 @@ public struct LaunchInfo: GraphQLFragment {
 
     public static let selections: [GraphQLSelection] = [
       GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
-      GraphQLFragmentSpread(RocketInfo.self),
+      GraphQLFragmentSpread(RocketFragment.self),
     ]
 
     public private(set) var resultMap: ResultMap
@@ -721,9 +670,9 @@ public struct LaunchInfo: GraphQLFragment {
         self.resultMap = unsafeResultMap
       }
 
-      public var rocketInfo: RocketInfo {
+      public var rocketFragment: RocketFragment {
         get {
-          return RocketInfo(unsafeResultMap: resultMap)
+          return RocketFragment(unsafeResultMap: resultMap)
         }
         set {
           resultMap += newValue.resultMap

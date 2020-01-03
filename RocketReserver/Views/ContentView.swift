@@ -11,6 +11,7 @@ private let dateFormatter: DateFormatter = {
 
 struct ContentView: View {
     @EnvironmentObject var dataStore: DataStore
+    @EnvironmentObject var errorStore: ErrorStore
 
     var body: some View {
         NavigationView {
@@ -18,8 +19,10 @@ struct ContentView: View {
                 .navigationBarTitle(Text("Launches"))
             LaunchDetailsView(launchId: nil)
         }.onAppear {
-            self.dataStore.loadLaunches() // this might be a problem later on...
-        }.navigationViewStyle(DoubleColumnNavigationViewStyle())
+            self.dataStore.fetchNextLaunchesPage() // this might be a problem later on...
+        }.alert(isPresented: $errorStore.showError,
+                content: { Alert(title: Text("Oops"), message: Text(self.errorStore.message)) })
+        .navigationViewStyle(DoubleColumnNavigationViewStyle())
     }
 }
 

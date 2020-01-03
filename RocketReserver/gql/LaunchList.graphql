@@ -1,10 +1,14 @@
-query LaunchList {
-  launches {
+fragment LaunchBasicFragment on Launch {
+  id
+  site
+}
+
+query LaunchList($pageSize: Int = 20, $after: String) {
+  launches(pageSize: $pageSize, after: $after) {
     cursor
     hasMore
     launches {
-      id
-      site
+      ...LaunchBasicFragment
     }
   }  
 }

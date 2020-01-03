@@ -1,0 +1,12 @@
+
+mutation LogMeIn($email: String) {
+  login(email: $email)
+}
+
+mutation BookingTrips($ids: [ID]!) {
+  bookTrips(launchIds: $ids) {
+    launches {
+      ...LaunchFragment
+    }
+  }
+}

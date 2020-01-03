@@ -15,12 +15,14 @@ struct LaunchDetailsView: View {
 
                     dataStore.selectedLaunch!
                         .mission?
+                        .fragments
+                        .missionFragment
                         .missionPatch
                         .flatMap({ URL(string: $0) })
                         .map({ NetworkImage(url: $0) })
 
                     VStack {
-                        Text(dataStore.selectedLaunch!.mission?.name ?? "No mission name")
+                        Text(dataStore.selectedLaunch!.mission?.fragments.missionFragment.name ?? "No mission name")
 
                         Text("ID: \(dataStore.selectedLaunch!.id)")
                         Text(dataStore.selectedLaunch!.site.map { "Site: \($0)" } ?? "Site without a name")
@@ -58,6 +60,7 @@ class NetworkImageResolver: ObservableObject {
     private var disposeBag: Set<AnyCancellable> = []
 
     func load(url: URL) {
+        print(url)
         URLSession
             .shared
             .dataTaskPublisher(for: url)

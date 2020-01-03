@@ -1,3 +1,26 @@
+fragment MissionFragment on Mission {
+  name
+  missionPatch(size: SMALL)
+}
+
+fragment RocketFragment on Rocket {
+  id
+  name
+  type
+}
+
+fragment LaunchFragment on Launch {
+  id
+  site
+  isBooked
+  mission {
+    ...MissionFragment
+  }
+  rocket {
+    ...RocketFragment
+  }
+}
+
 query LaunchDetails($launchId: ID!) {
   launch(id: $launchId) {
       id
@@ -15,25 +38,8 @@ query LaunchDetails($launchId: ID!) {
   }
 }
 
-fragment MissionInfo on Mission {
-  name
-  missionPatch
-}
-
-fragment RocketInfo on Rocket {
-  id
-  name
-  type
-}
-
-fragment LaunchInfo on Launch {
-  id
-  site
-  isBooked
-  mission {
-    ...MissionInfo
-  }
-  rocket {
-    ...RocketInfo
+query LaunchDetailsWithFragments($launchId: ID!) {
+  launch(id: $launchId) {
+    ...LaunchFragment
   }
 }
