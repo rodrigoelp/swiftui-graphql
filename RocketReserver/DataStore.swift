@@ -84,12 +84,13 @@ class DataStore: ObservableObject {
     @Published private var currentCursor: String? = nil
     @Published private var hasMore: Bool = true
 
+    @Published var userEmail: String = ""
+    @Published var authToken: String = ""
+
     let errors = ErrorStore()
 
     private var disposeBag: Set<AnyCancellable> = []
-    private var backend: ApolloClient {
-        Network.shared.spaceEndpoint
-    }
+    private var backend: ApolloClient { Network.shared.spaceEndpoint }
 
     deinit {
         disposeBag.removeAll()
@@ -144,14 +145,27 @@ class DataStore: ObservableObject {
             .store(in: &disposeBag)
     }
 
-    func logIn() {
-        backend.perform(mutation: LogMeInMutation(email: "freq@aa.com")) { result in
-            switch result {
-                case .success(let d):
-                    print(d)
-                case .failure(let e):
-                    print(e)
-            }
-        }
+    func logIn(email: String) {
+        let getToken = backend.performPublisher(mutation: LogMeInMutation(email: email))
+            .map({ $0?.login })
+            .catch({ _ -> Just<String?> in Just(nil) })
+            .filter({ $0 != nil && $0 != "" })
+            .map({ $0! })
+            .share()
+
+        getToken
+            .sink(receiveValue: { [weak self] token in
+                guard let self = self else { return }
+                self.authToken = token
+                Network.shared.networkPreflight.authToken = token
+            }).store(in: &disposeBag)
+    }
+
+    func bookTrip(id: String) -> AnyPublisher<Int, Never> {
+        return backend.performPublisher(mutation: BookingTripsMutation(ids: [ id ]))
+            .map({ $0?.bookTrips.launches?.compactMap({ $0 }) ?? [] })
+            .map({ $0.reduce(0) { $1.fragments.launchFragment.isBooked ? $0 + 1 : $0 }})
+            .catch({ _ -> Just<Int> in Just(0) })
+            .eraseToAnyPublisher()
     }
 }

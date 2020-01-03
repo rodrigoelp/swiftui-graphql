@@ -6,9 +6,10 @@ import Combine
 
 struct LaunchDetailsView: View {
     @EnvironmentObject var dataStore: DataStore
-    let launchId: String?
+    @State var operation: String = ""
+    @State private var disposeBag: Set<AnyCancellable> = []
 
-    @State var imageContent: Data = Data()
+    let launchId: String?
 
     init(launchId: String?) {
         self.launchId = launchId
@@ -17,7 +18,13 @@ struct LaunchDetailsView: View {
     var body: some View {
         Group {
             if dataStore.selectedLaunch?.id != nil {
-                MissionDetailsView(launch: dataStore.selectedLaunch!)
+                VStack {
+                    MissionDetailsView(launch: dataStore.selectedLaunch!)
+
+                    Button(action: self.bookTrip, label: { Text("Book Now!") })
+
+                    Text(operation)
+                }
             } else {
                 Text("Select a launch to view details.")
             }
@@ -28,6 +35,14 @@ struct LaunchDetailsView: View {
             }
         })
             .navigationBarTitle(Text("Launch Details"))
+    }
+
+    func bookTrip() {
+        guard let id = launchId else { return }
+        dataStore.bookTrip(id: id)
+            .map({ "This mission has been booked \($0) times" })
+            .assign(to: \.operation, on: self)
+            .store(in: &disposeBag)
     }
 }
 
@@ -41,7 +56,7 @@ struct MissionDetailsView: View {
                 .missionFragment
                 .missionPatch
                 .flatMap({ URL(string: $0) })
-                .map({ NetworkImage(url: $0) })
+                .map({ NetworkImage(url: $0).frame(width: 150, height: 140, alignment: .center) })
 
             VStack {
                 Text(launch.mission?.fragments.missionFragment.name ?? "No mission name")
@@ -84,7 +99,6 @@ class NetworkImageResolver: ObservableObject {
     }
 
     func load(url: URL) {
-        print(url)
         ImageCache.shared
             .fetchImage(forUrl: url)
             .tryMap({
@@ -92,11 +106,9 @@ class NetworkImageResolver: ObservableObject {
                 guard let image = UIImage(data: $0) else {
                     throw ImageResolverError.invalid
                 }
-                print("provided image...")
-                return Image(uiImage: image)
+                return Image(uiImage: image).resizable()
             })
             .catch({ e -> Just<Image> in
-                print("Failed getting the image \(String(describing: e))")
                 return Just(Image(systemName: "livephoto"))
             })
             .receive(on: RunLoop.main)

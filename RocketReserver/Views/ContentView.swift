@@ -1,15 +1,18 @@
-//
-
 import SwiftUI
 
-private let dateFormatter: DateFormatter = {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateStyle = .medium
-    dateFormatter.timeStyle = .medium
-    return dateFormatter
-}()
-
 struct ContentView: View {
+    @EnvironmentObject var dataStore: DataStore
+
+    var body: some View {
+        if dataStore.authToken != "" {
+            return AnyView(LoggedInContentView())
+        } else {
+            return AnyView(LoginView())
+        }
+    }
+}
+
+struct LoggedInContentView: View {
     @EnvironmentObject var dataStore: DataStore
     @EnvironmentObject var errorStore: ErrorStore
 
@@ -22,12 +25,13 @@ struct ContentView: View {
             self.dataStore.fetchNextLaunchesPage() // this might be a problem later on...
         }.alert(isPresented: $errorStore.showError,
                 content: { Alert(title: Text("Oops"), message: Text(self.errorStore.message)) })
-        .navigationViewStyle(DoubleColumnNavigationViewStyle())
+            .navigationViewStyle(DoubleColumnNavigationViewStyle())
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .environmentObject(DataStore())
     }
 }

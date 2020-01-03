@@ -26,6 +26,7 @@
 		DC89E7BA23BAC69B00661104 /* LaunchListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89E7B923BAC69B00661104 /* LaunchListView.swift */; };
 		DC89E7BC23BAC6AB00661104 /* LaunchDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89E7BB23BAC6AB00661104 /* LaunchDetailsView.swift */; };
 		DC89E7BE23BACE3500661104 /* ApolloClient+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89E7BD23BACE3500661104 /* ApolloClient+Extensions.swift */; };
+		DC8E0DBD23BEF68E00BE5D1C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E0DBC23BEF68E00BE5D1C /* LoginView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +52,7 @@
 		DC89E7BB23BAC6AB00661104 /* LaunchDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchDetailsView.swift; sourceTree = "<group>"; };
 		DC89E7BD23BACE3500661104 /* ApolloClient+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApolloClient+Extensions.swift"; sourceTree = "<group>"; };
 		DC89E7BF23BAD18400661104 /* DetailsForLaunch.graphql */ = {isa = PBXFileReference; lastKnownFileType = text; path = DetailsForLaunch.graphql; sourceTree = "<group>"; };
+		DC8E0DBC23BEF68E00BE5D1C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,6 +141,7 @@
 				DC301F7023B9DBFB00E98C2D /* ContentView.swift */,
 				DC89E7B923BAC69B00661104 /* LaunchListView.swift */,
 				DC89E7BB23BAC6AB00661104 /* LaunchDetailsView.swift */,
+				DC8E0DBC23BEF68E00BE5D1C /* LoginView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -252,6 +255,7 @@
 				DC89E7BA23BAC69B00661104 /* LaunchListView.swift in Sources */,
 				DC413CFC23BD961E00AF6AC1 /* Mutations.graphql.swift in Sources */,
 				DC413CF023BD74FF00AF6AC1 /* LaunchList.graphql.swift in Sources */,
+				DC8E0DBD23BEF68E00BE5D1C /* LoginView.swift in Sources */,
 				DC413CF123BD74FF00AF6AC1 /* DetailsForLaunch.graphql.swift in Sources */,
 				DC89E7BC23BAC6AB00661104 /* LaunchDetailsView.swift in Sources */,
 				DC301F6D23B9DBFB00E98C2D /* AppDelegate.swift in Sources */,

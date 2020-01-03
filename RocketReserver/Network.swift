@@ -9,10 +9,11 @@ class Network {
 //    private let endpoint = URL(string: "http://localhost:4000/graphql")! // switching to a local server for fun.
     static let shared = Network()
 
-    private(set) lazy var spaceEndpoint = Network.createClient(url: endpoint, dbName: "local-cache.sqlite")
+    private(set) lazy var networkPreflight = HttpNetworkPreflightDelegate()
+    private(set) lazy var httpTransport = HTTPNetworkTransport(url: endpoint, delegate: networkPreflight)
+    private(set) lazy var spaceEndpoint = Network.createClient(url: endpoint, dbName: "local-cache.sqlite", httpTransport: httpTransport)
 
-    private static func createClient(url: URL, dbName: String) -> ApolloClient {
-        let httpTransport = HTTPNetworkTransport(url: url)
+    private static func createClient(url: URL, dbName: String, httpTransport: HTTPNetworkTransport) -> ApolloClient {
         let dbUrl = try! FileManager.default.url(for: .documentDirectory,
                                                  in: .userDomainMask,
                                                  appropriateFor: nil,
@@ -23,5 +24,18 @@ class Network {
         let client = ApolloClient(networkTransport: httpTransport, store: store)
         client.cacheKeyForObject = { $0["id"] }
         return client
+    }
+}
+
+class HttpNetworkPreflightDelegate: HTTPNetworkTransportPreflightDelegate {
+    var authToken: String = ""
+
+    func networkTransport(_ networkTransport: HTTPNetworkTransport, shouldSend request: URLRequest) -> Bool {
+        return true
+    }
+
+    func networkTransport(_ networkTransport: HTTPNetworkTransport, willSend request: inout URLRequest) {
+        request.setValue(authToken, forHTTPHeaderField: "authToken")
+        request.setValue(authToken, forHTTPHeaderField: "authorization")
     }
 }
