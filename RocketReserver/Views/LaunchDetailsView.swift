@@ -8,26 +8,16 @@ struct LaunchDetailsView: View {
     @EnvironmentObject var dataStore: DataStore
     let launchId: String?
 
+    @State var imageContent: Data = Data()
+
+    init(launchId: String?) {
+        self.launchId = launchId
+    }
+
     var body: some View {
         Group {
             if dataStore.selectedLaunch?.id != nil {
-                HStack {
-
-                    dataStore.selectedLaunch!
-                        .mission?
-                        .fragments
-                        .missionFragment
-                        .missionPatch
-                        .flatMap({ URL(string: $0) })
-                        .map({ NetworkImage(url: $0) })
-
-                    VStack {
-                        Text(dataStore.selectedLaunch!.mission?.fragments.missionFragment.name ?? "No mission name")
-
-                        Text("ID: \(dataStore.selectedLaunch!.id)")
-                        Text(dataStore.selectedLaunch!.site.map { "Site: \($0)" } ?? "Site without a name")
-                    }
-                }
+                MissionDetailsView(launch: dataStore.selectedLaunch!)
             } else {
                 Text("Select a launch to view details.")
             }
@@ -36,45 +26,81 @@ struct LaunchDetailsView: View {
                 self.dataStore
                     .fetchDetails(launchId: launchId)
             }
-        }).navigationBarTitle(Text("Launch Details"))
+        })
+            .navigationBarTitle(Text("Launch Details"))
+    }
+}
+
+struct MissionDetailsView: View {
+    let launch: LaunchFragment
+
+    var body: some View {
+        HStack {
+            launch.mission?
+                .fragments
+                .missionFragment
+                .missionPatch
+                .flatMap({ URL(string: $0) })
+                .map({ NetworkImage(url: $0) })
+
+            VStack {
+                Text(launch.mission?.fragments.missionFragment.name ?? "No mission name")
+
+                Text("ID: \(launch.id)")
+                Text(launch.site.map { "Site: \($0)" } ?? "Site without a name")
+            }
+        }
     }
 }
 
 struct NetworkImage: View {
     let url: URL
-    @ObservedObject private var resolver = NetworkImageResolver()
+    @ObservedObject private var resolver: NetworkImageResolver
+
+    init(url: URL) {
+        self.url = url
+        resolver = NetworkImageResolver()
+        resolver.load(url: url)
+    }
 
     var body: some View {
         Group {
-            resolver.content
-                .map { UIImage(data: $0)! }
-                .map { Image(uiImage: $0 ) }
-                ?? Image(systemName: "livephoto")
-        }.onAppear(perform: { self.resolver.load(url: self.url) })
+            resolver.image
+        }
     }
 }
 
-class NetworkImageResolver: ObservableObject {
-    @Published var content: Data? = nil
+enum ImageResolverError: Error {
+    case invalid
+}
 
+class NetworkImageResolver: ObservableObject {
     private var disposeBag: Set<AnyCancellable> = []
 
-    func load(url: URL) {
-        print(url)
-        URLSession
-            .shared
-            .dataTaskPublisher(for: url)
-            .map({ Optional.some($0.data) })
-            .catch({ e -> Just<Data?> in
-                print("Failed getting the image \(String(describing: e))")
-                return Just(nil)
-            })
-            .receive(on: RunLoop.main)
-            .assign(to: \.content, on: self)
-            .store(in: &disposeBag)
-    }
+    @Published var image: Image = Image(systemName: "photo")
 
     deinit {
         disposeBag.removeAll()
+    }
+
+    func load(url: URL) {
+        print(url)
+        ImageCache.shared
+            .fetchImage(forUrl: url)
+            .tryMap({
+                print(String(describing: $0))
+                guard let image = UIImage(data: $0) else {
+                    throw ImageResolverError.invalid
+                }
+                print("provided image...")
+                return Image(uiImage: image)
+            })
+            .catch({ e -> Just<Image> in
+                print("Failed getting the image \(String(describing: e))")
+                return Just(Image(systemName: "livephoto"))
+            })
+            .receive(on: RunLoop.main)
+            .assign(to: \.image, on: self)
+            .store(in: &disposeBag)
     }
 }

@@ -9,6 +9,73 @@ class ErrorStore: ObservableObject {
     @Published var message: String = ""
 }
 
+final class Cache<Key: Hashable, Value> {
+    final class WrappedKey: NSObject {
+        let key: Key
+        init(_ key: Key) { self.key = key }
+
+        override var hash: Int { key.hashValue }
+        override func isEqual(_ object: Any?) -> Bool {
+            guard let value = object as? WrappedKey else { return false }
+            return value.key == key
+        }
+    }
+
+    final class Entry {
+        let value: Value
+        init(_ value: Value) { self.value = value }
+    }
+
+    deinit {
+        wrapped.removeAllObjects()
+    }
+
+    private let wrapped = NSCache<WrappedKey, Entry>()
+
+    func cache(_ value: Value, forKey key: Key) {
+        wrapped.setObject(Entry(value), forKey: WrappedKey(key))
+    }
+
+    func get(forKey key: Key) -> Value? {
+        return wrapped.object(forKey: WrappedKey(key))?.value
+    }
+}
+
+
+class ImageCache {
+    static var shared = ImageCache()
+
+    private var cache: Cache<String, Data> = Cache()
+    private var disposeBag: Set<AnyCancellable> = []
+
+    func fetchImage(forUrl url: URL) -> AnyPublisher<Data, Never> {
+        if let image = cache.get(forKey: url.absoluteString) {
+            return Just(image).eraseToAnyPublisher()
+        }
+
+        let content = URLSession
+            .shared
+            .dataTaskPublisher(for: url)
+            .map({ Optional.some($0.data) })
+            .catch({ e -> Just<Data?> in
+                print("Failed getting the image \(String(describing: e))")
+                return Just(nil)
+            })
+            .share()
+
+        content
+            .filter({ $0 != nil })
+            .sink(receiveCompletion: { _ in return },
+                  receiveValue: { [weak self] data in
+                    guard let self = self else { return }
+                    self.cache.cache(data!, forKey: url.absoluteString)
+            })
+            .store(in: &disposeBag)
+
+        return content.map({ $0 ?? Data() }).eraseToAnyPublisher()
+    }
+}
+
 class DataStore: ObservableObject {
     @Published var launches = [LaunchBasicFragment]() // this graphql data definition is just stupid :|
 
