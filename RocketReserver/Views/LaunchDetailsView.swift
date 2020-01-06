@@ -56,7 +56,7 @@ struct MissionDetailsView: View {
                 .missionFragment
                 .missionPatch
                 .flatMap({ URL(string: $0) })
-                .map({ NetworkImage(url: $0).frame(width: 150, height: 140, alignment: .center) })
+                .map({ NetworkImage(url: $0).frame(width: 150, height: 150, alignment: .center) })
 
             VStack {
                 Text(launch.mission?.fragments.missionFragment.name ?? "No mission name")

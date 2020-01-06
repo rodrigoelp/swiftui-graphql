@@ -27,6 +27,7 @@
 		DC89E7BC23BAC6AB00661104 /* LaunchDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89E7BB23BAC6AB00661104 /* LaunchDetailsView.swift */; };
 		DC89E7BE23BACE3500661104 /* ApolloClient+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89E7BD23BACE3500661104 /* ApolloClient+Extensions.swift */; };
 		DC8E0DBD23BEF68E00BE5D1C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E0DBC23BEF68E00BE5D1C /* LoginView.swift */; };
+		DCB724F023C2BADB000B4EE9 /* Subscriptions.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB724EF23C2BADB000B4EE9 /* Subscriptions.graphql.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,8 @@
 		DC89E7BD23BACE3500661104 /* ApolloClient+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApolloClient+Extensions.swift"; sourceTree = "<group>"; };
 		DC89E7BF23BAD18400661104 /* DetailsForLaunch.graphql */ = {isa = PBXFileReference; lastKnownFileType = text; path = DetailsForLaunch.graphql; sourceTree = "<group>"; };
 		DC8E0DBC23BEF68E00BE5D1C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		DCB724EE23C2BA23000B4EE9 /* Subscriptions.graphql */ = {isa = PBXFileReference; lastKnownFileType = text; path = Subscriptions.graphql; sourceTree = "<group>"; };
+		DCB724EF23C2BADB000B4EE9 /* Subscriptions.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Subscriptions.graphql.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,7 +93,7 @@
 			isa = PBXGroup;
 			children = (
 				DC89E7B823BAC67B00661104 /* Views */,
-				DC301F8D23B9E26E00E98C2D /* gql */,
+				DC301F8D23B9E26E00E98C2D /* graphql */,
 				DC301F8B23B9E1F100E98C2D /* schema.json */,
 				DC301F6C23B9DBFB00E98C2D /* AppDelegate.swift */,
 				DC301F6E23B9DBFB00E98C2D /* SceneDelegate.swift */,
@@ -112,7 +115,7 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		DC301F8D23B9E26E00E98C2D /* gql */ = {
+		DC301F8D23B9E26E00E98C2D /* graphql */ = {
 			isa = PBXGroup;
 			children = (
 				DC89E7BD23BACE3500661104 /* ApolloClient+Extensions.swift */,
@@ -124,8 +127,10 @@
 				DC301F9623B9EAF000E98C2D /* Types.Extensions.swift */,
 				DC413CF923BD95F100AF6AC1 /* Mutations.graphql */,
 				DC413CFB23BD961E00AF6AC1 /* Mutations.graphql.swift */,
+				DCB724EE23C2BA23000B4EE9 /* Subscriptions.graphql */,
+				DCB724EF23C2BADB000B4EE9 /* Subscriptions.graphql.swift */,
 			);
-			path = gql;
+			path = graphql;
 			sourceTree = "<group>";
 		};
 		DC413CFD23BDBDB800AF6AC1 /* Frameworks */ = {
@@ -238,7 +243,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Go to the build root and search up the chain to find the Derived Data Path where the source packages are checked out.\nDERIVED_DATA_CANDIDATE=\"${BUILD_ROOT}\"\n\nwhile ! [ -d \"${DERIVED_DATA_CANDIDATE}/SourcePackages\" ]; do\n  if [ \"${DERIVED_DATA_CANDIDATE}\" = / ]; then\n    echo >&2 \"error: Unable to locate SourcePackages directory from BUILD_ROOT: '${BUILD_ROOT}'\"\n    exit 1\n  fi\n\n  DERIVED_DATA_CANDIDATE=\"$(dirname \"${DERIVED_DATA_CANDIDATE}\")\"\ndone\n\n# Grab a reference to the directory where scripts are checked out\nSCRIPT_PATH=\"${DERIVED_DATA_CANDIDATE}/SourcePackages/checkouts/apollo-ios/scripts\"\n\nif [ -z \"${SCRIPT_PATH}\" ]; then\n    echo >&2 \"error: Couldn't find the CLI script in your checked out SPM packages; make sure to add the framework to your project.\"\n    exit 1\nfi\n\ncd \"${SRCROOT}/${TARGET_NAME}\"\n# echo \"Downloading schema from the server.\"\n# \"${SCRIPT_PATH}\"/run-bundled-codegen.sh schema:download --endpoint=\"https://n1kqy.sse.codesandbox.io/\"\n\necho \"Generating code for the given schema.\"\n#\"${SCRIPT_PATH}\"/run-bundled-codegen.sh codegen:generate --target=swift --includes=./**/*.graphql --localSchemaFile=\"schema.json\" GraphQL.Models.swift\n\"${SCRIPT_PATH}\"/run-bundled-codegen.sh codegen:generate --target=swift --includes=./**/*.graphql --localSchemaFile=\"schema.json\" gql/\n\n# rm -rf gql/GraphQL.Models.swift\n# cp GraphQL.Models.swift gql/GraphQL.Models.swift\n# rm -rf GraphQL.Models.swift\n";
+			shellScript = "# Go to the build root and search up the chain to find the Derived Data Path where the source packages are checked out.\nDERIVED_DATA_CANDIDATE=\"${BUILD_ROOT}\"\n\nwhile ! [ -d \"${DERIVED_DATA_CANDIDATE}/SourcePackages\" ]; do\n  if [ \"${DERIVED_DATA_CANDIDATE}\" = / ]; then\n    echo >&2 \"error: Unable to locate SourcePackages directory from BUILD_ROOT: '${BUILD_ROOT}'\"\n    exit 1\n  fi\n\n  DERIVED_DATA_CANDIDATE=\"$(dirname \"${DERIVED_DATA_CANDIDATE}\")\"\ndone\n\n# Grab a reference to the directory where scripts are checked out\nSCRIPT_PATH=\"${DERIVED_DATA_CANDIDATE}/SourcePackages/checkouts/apollo-ios/scripts\"\n\nif [ -z \"${SCRIPT_PATH}\" ]; then\n    echo >&2 \"error: Couldn't find the CLI script in your checked out SPM packages; make sure to add the framework to your project.\"\n    exit 1\nfi\n\ncd \"${SRCROOT}/${TARGET_NAME}\"\n# echo \"Downloading schema from the server.\"\n# \"${SCRIPT_PATH}\"/run-bundled-codegen.sh schema:download --endpoint=\"https://n1kqy.sse.codesandbox.io/\"\n\necho \"Generating code for the given schema.\"\n#\"${SCRIPT_PATH}\"/run-bundled-codegen.sh codegen:generate --target=swift --includes=./**/*.graphql --localSchemaFile=\"schema.json\" GraphQL.Models.swift\n\"${SCRIPT_PATH}\"/run-bundled-codegen.sh codegen:generate --target=swift --includes=./**/*.graphql --localSchemaFile=\"schema.json\" graphql/\n\n# rm -rf gql/GraphQL.Models.swift\n# cp GraphQL.Models.swift gql/GraphQL.Models.swift\n# rm -rf GraphQL.Models.swift\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -259,6 +264,7 @@
 				DC413CF123BD74FF00AF6AC1 /* DetailsForLaunch.graphql.swift in Sources */,
 				DC89E7BC23BAC6AB00661104 /* LaunchDetailsView.swift in Sources */,
 				DC301F6D23B9DBFB00E98C2D /* AppDelegate.swift in Sources */,
+				DCB724F023C2BADB000B4EE9 /* Subscriptions.graphql.swift in Sources */,
 				DC301F6F23B9DBFB00E98C2D /* SceneDelegate.swift in Sources */,
 				DC301F7123B9DBFB00E98C2D /* ContentView.swift in Sources */,
 			);

@@ -7,9 +7,7 @@ import Apollo
 extension ApolloClient {
     func fetchPublisher<Query: GraphQLQuery>(query: Query) -> AnyPublisher<Query.Data?, Error> {
         return Future { [weak self] completion in
-            guard let self = self else { return }
-
-            self.fetch(query: query) { result in
+            self?.fetch(query: query) { result in
                 completion(ApolloClient.unwrapResult(result))
             }
         }.eraseToAnyPublisher()
@@ -17,8 +15,15 @@ extension ApolloClient {
 
     func performPublisher<Mutation: GraphQLMutation>(mutation: Mutation) -> AnyPublisher<Mutation.Data?, Error> {
         return Future { [weak self] completion in
-            guard let self = self else { return }
-            self.perform(mutation: mutation) { result in
+            self?.perform(mutation: mutation) { result in
+                completion(ApolloClient.unwrapResult(result))
+            }
+        }.eraseToAnyPublisher()
+    }
+
+    func subscribePublisher<Subscription: GraphQLSubscription>(subscription: Subscription) -> AnyPublisher<Subscription.Data?, Error> {
+        return Future { [weak self] completion in
+            self?.subscribe(subscription: subscription) { result in
                 completion(ApolloClient.unwrapResult(result))
             }
         }.eraseToAnyPublisher()
