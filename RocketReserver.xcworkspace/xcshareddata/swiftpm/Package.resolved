@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "ApolloPublishers",
+        "repositoryURL": "https://github.com/rodrigoelp/apollo-ios-publishers.git",
+        "state": {
+          "branch": null,
+          "revision": "39d43ade8a3133822c62e4eccdefdb39616e189b",
+          "version": null
+        }
+      },
+      {
         "package": "SQLite.swift",
         "repositoryURL": "https://github.com/stephencelis/SQLite.swift.git",
         "state": {

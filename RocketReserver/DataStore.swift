@@ -3,6 +3,7 @@
 import Foundation
 import Combine
 import Apollo
+import ApolloPublishers
 
 class ErrorStore: ObservableObject {
     @Published var showError: Bool = false
@@ -76,31 +77,38 @@ class ImageCache {
     }
 }
 
+typealias GraphCancellable = Apollo.Cancellable
+
 class DataStore: ObservableObject {
     @Published var launches = [LaunchBasicFragment]() // this graphql data definition is just stupid :|
 
     @Published var selectedLaunch: LaunchFragment? = nil
 
-    @Published private var currentCursor: String? = nil
-    @Published private var hasMore: Bool = true
+    @Published private var launchesCurrentCursor: String? = nil
+    @Published private var hasMoreLaunches: Bool = true
 
     @Published var userEmail: String = ""
     @Published var authToken: String = ""
+
+    @Published var showMessages = false
 
     let errors = ErrorStore()
 
     private var disposeBag: Set<AnyCancellable> = []
     private var backend: ApolloClient { Network.shared.spaceEndpoint }
 
+    private var subscriptions = [GraphCancellable]()
+
     deinit {
         disposeBag.removeAll()
     }
 
     func fetchNextLaunchesPage() {
-        if !hasMore { return }
+        if !hasMoreLaunches { return }
         print("Fetching a page of results.")
 
-        let queryResult = backend.fetchPublisher(query: LaunchListQuery(pageSize: 20, after: currentCursor))
+        let queryResult = backend.fetchPublisher(query: LaunchListQuery(pageSize: 20, after: launchesCurrentCursor))
+            .asPureResult()
             .share()
 
         queryResult
@@ -117,15 +125,16 @@ class DataStore: ObservableObject {
             .store(in: &disposeBag)
 
         queryResult
-            .catch({ _ in Just(nil) })
-            .filter({ $0 != nil })
             .receive(on: RunLoop.main)
-            .map({ $0!.launches })
-            .sink(receiveValue: { [weak self] data in
-                guard let self = self else { return }
+            .map({ $0.launches })
+            .map(Optional.some)
+            .catch({ _ in Just(nil) })
+            .sink(receiveValue: { [weak self] d in
+                guard let self = self,
+                    let data = d else { return }
                 print("Fetch completed.")
-                self.hasMore = data.hasMore
-                self.currentCursor = data.cursor
+                self.hasMoreLaunches = data.hasMore
+                self.launchesCurrentCursor = data.cursor
                 print("Cursor is: \(data.cursor)")
                 let newLaunches = data.launches.compactMap({ $0 }).map({ $0.fragments.launchBasicFragment })
                 self.launches.append(contentsOf: newLaunches)
@@ -133,12 +142,18 @@ class DataStore: ObservableObject {
             }).store(in: &disposeBag)
     }
 
+    func fetchDetailsPublisher(launchId: String) -> AnyPublisher<LaunchFragment?, Error> {
+        backend
+            .fetchPublisher(query: LaunchDetailsWithFragmentsQuery(launchId: launchId))
+            .asPureResult()
+            .map({ $0.launch?.fragments.launchFragment })
+            .eraseToAnyPublisher()
+    }
+
     func fetchDetails(launchId: String) {
         disposeBag.removeAll()
 
-        backend
-            .fetchPublisher(query: LaunchDetailsWithFragmentsQuery(launchId: launchId))
-            .map({ $0?.launch?.fragments.launchFragment })
+        fetchDetailsPublisher(launchId: launchId)
             .catch({ _ in Just(nil) })
             .receive(on: RunLoop.main)
             .assign(to: \.selectedLaunch, on: self)
@@ -146,26 +161,78 @@ class DataStore: ObservableObject {
     }
 
     func logIn(email: String) {
-        let getToken = backend.performPublisher(mutation: LogMeInMutation(email: email))
-            .map({ $0?.login })
+        backend
+            .performPublisher(mutation: LogMeInMutation(email: email))
+            .asPureResult()
+            .map({ $0.login })
             .catch({ _ -> Just<String?> in Just(nil) })
             .filter({ $0 != nil && $0 != "" })
             .map({ $0! })
-            .share()
-
-        getToken
             .sink(receiveValue: { [weak self] token in
                 guard let self = self else { return }
                 self.authToken = token
-                Network.shared.networkPreflight.authToken = token
+                Network.reconfigure(withToken: token)
             }).store(in: &disposeBag)
     }
 
     func bookTrip(id: String) -> AnyPublisher<Int, Never> {
-        return backend.performPublisher(mutation: BookingTripsMutation(ids: [ id ]))
-            .map({ $0?.bookTrips.launches?.compactMap({ $0 }) ?? [] })
-            .map({ $0.reduce(0) { $1.fragments.launchFragment.isBooked ? $0 + 1 : $0 }})
+        return backend
+            .performPublisher(mutation: BookingTripsMutation(ids: [id]))
+            .asPureResult()
+            .map({ $0.bookTrips.launches?.compactMap({ $0 }) ?? [] })
+            .map({ $0.reduce(0, { $1.fragments.launchFragment.isBooked ? $0 + 1 : $0 }) })
             .catch({ _ -> Just<Int> in Just(0) })
+            .eraseToAnyPublisher()
+    }
+
+    func fetchMessagesPage(cursor: String?) -> AnyPublisher<MessageListQuery.Data.PassengerMessage?, Never> {
+        return backend.fetchPublisher(query: MessageListQuery(pageSize: 20, after: cursor), cachePolicy: .returnCacheDataElseFetch)
+            .asPureResult()
+            .map({ $0.passengerMessages })
+            .catch({ _ -> Just<MessageListQuery.Data.PassengerMessage?> in Just(nil) })
+            .filter({ $0 != nil })
+            .eraseToAnyPublisher()
+    }
+
+    func postMessage(_ msg: String) -> AnyPublisher<MessageFragment?, Never> {
+        return backend.performPublisher(mutation: SaveMessageMutation(message: msg))
+        .asPureResult()
+            .map({ $0.addMessage?.fragments.messageFragment })
+            .catch({ _ -> Just<MessageFragment?> in Just(nil) })
+            .eraseToAnyPublisher()
+    }
+
+    func flush() {
+        self.subscriptions.forEach({ $0.cancel() })
+        self.subscriptions.removeAll()
+    }
+
+    func listen() {
+        let subs = backend.subscribe(subscription: ListenToBookingsSubscription()) { result in
+            print(result)
+        }
+
+        self.subscriptions.append(subs)
+    }
+
+    func listenToBookigs() -> AnyPublisher<String?, Never> {
+        return backend.publisher(for: ListenToBookingsSubscription())
+            .map({ $0?.tripBooked.id })
+            .catch({ _ -> Just<String?> in Just(nil) })
+            .eraseToAnyPublisher()
+    }
+
+    func listenToBookingsDoneFor(launchId: String) -> AnyPublisher<LaunchFragment?, Never> {
+        return self.listenToBookigs()
+            .filter({
+                $0 == launchId
+            })
+            .flatMap({ id -> AnyPublisher<LaunchFragment?, Never> in
+                guard let _id = id else { return Just(nil).eraseToAnyPublisher() }
+                return self.fetchDetailsPublisher(launchId: _id)
+                    .catch({ _ -> Just<LaunchFragment?> in Just(nil) })
+                    .eraseToAnyPublisher()
+            })
             .eraseToAnyPublisher()
     }
 }

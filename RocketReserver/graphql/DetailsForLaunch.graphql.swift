@@ -486,6 +486,7 @@ public struct LaunchFragment: GraphQLFragment {
       __typename
       id
       site
+      pax
       isBooked
       mission {
         __typename
@@ -504,6 +505,7 @@ public struct LaunchFragment: GraphQLFragment {
     GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
     GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
     GraphQLField("site", type: .scalar(String.self)),
+    GraphQLField("pax", type: .scalar(Int.self)),
     GraphQLField("isBooked", type: .nonNull(.scalar(Bool.self))),
     GraphQLField("mission", type: .object(Mission.selections)),
     GraphQLField("rocket", type: .object(Rocket.selections)),
@@ -515,8 +517,8 @@ public struct LaunchFragment: GraphQLFragment {
     self.resultMap = unsafeResultMap
   }
 
-  public init(id: GraphQLID, site: String? = nil, isBooked: Bool, mission: Mission? = nil, rocket: Rocket? = nil) {
-    self.init(unsafeResultMap: ["__typename": "Launch", "id": id, "site": site, "isBooked": isBooked, "mission": mission.flatMap { (value: Mission) -> ResultMap in value.resultMap }, "rocket": rocket.flatMap { (value: Rocket) -> ResultMap in value.resultMap }])
+  public init(id: GraphQLID, site: String? = nil, pax: Int? = nil, isBooked: Bool, mission: Mission? = nil, rocket: Rocket? = nil) {
+    self.init(unsafeResultMap: ["__typename": "Launch", "id": id, "site": site, "pax": pax, "isBooked": isBooked, "mission": mission.flatMap { (value: Mission) -> ResultMap in value.resultMap }, "rocket": rocket.flatMap { (value: Rocket) -> ResultMap in value.resultMap }])
   }
 
   public var __typename: String {
@@ -543,6 +545,15 @@ public struct LaunchFragment: GraphQLFragment {
     }
     set {
       resultMap.updateValue(newValue, forKey: "site")
+    }
+  }
+
+  public var pax: Int? {
+    get {
+      return resultMap["pax"] as? Int
+    }
+    set {
+      resultMap.updateValue(newValue, forKey: "pax")
     }
   }
 

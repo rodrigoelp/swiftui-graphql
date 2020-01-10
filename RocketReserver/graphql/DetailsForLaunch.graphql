@@ -12,6 +12,7 @@ fragment RocketFragment on Rocket {
 fragment LaunchFragment on Launch {
   id
   site
+  pax
   isBooked
   mission {
     ...MissionFragment

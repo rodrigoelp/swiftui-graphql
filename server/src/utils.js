@@ -65,5 +65,17 @@ module.exports.createStore = () => {
     userId: SQL.INTEGER,
   });
 
-  return { users, trips };
+  const messages = db.define('message', {
+    id: {
+      type: SQL.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    createdAt: SQL.DATE,
+    updatedAt: SQL.DATE,
+    userId: SQL.INTEGER,
+    message: SQL.STRING,
+  });
+
+  return { users, trips, messages };
 };

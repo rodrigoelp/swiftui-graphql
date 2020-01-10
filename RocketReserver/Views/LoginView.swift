@@ -14,8 +14,6 @@ struct LoginView: View {
                 .textContentType(UITextContentType.emailAddress)
                 .autocapitalization(UITextAutocapitalizationType.none)
                 .padding()
-            
-            Text(store.authToken)
 
             Button(action: { self.store.logIn(email: self.email) }, label: { Text("Start!") })
         }

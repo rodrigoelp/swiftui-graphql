@@ -10,7 +10,9 @@ struct LaunchListView: View {
         List {
             ForEach(launches) { item in
                 NavigationLink(
-                    destination: LaunchDetailsView(launchId: item.id)
+                    destination: LaunchDetailsView(launchId: item.id,
+                                                   viewModel: LaunchDetailsViewModel(id: item.id,
+                                                                                     dataStore: self.dataStore))
                 ) {
                     Text(self.getLaunchName(item))
                 }.onAppear(perform: { self.itemPresented(item) })

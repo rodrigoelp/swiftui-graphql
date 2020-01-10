@@ -1,0 +1,26 @@
+
+fragment MessageFragment on PassengerMessage {
+  id
+  userId
+  message
+}
+
+query MessageList($pageSize: Int! = 20, $after: String) {
+  passengerMessages(pageSize: $pageSize, after: $after) {
+    messages {
+      ...MessageFragment
+    }
+  }
+}
+
+mutation SaveMessage($message: String!) {
+  addMessage(message: $message) {
+    ...MessageFragment
+  }
+}
+
+subscription ListenForMessages {
+  postedMessages {
+    ...MessageFragment
+  }
+}
