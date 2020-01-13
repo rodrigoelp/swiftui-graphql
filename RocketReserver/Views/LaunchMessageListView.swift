@@ -28,9 +28,6 @@ class MessageListViewModel: ObservableObject {
     }
 
     private func setup() {
-        disposeBag.removeAll()
-        subscription?.cancel()
-
         dataStore.fetchMessagesPage(cursor: nil)
             .receive(on: RunLoop.main)
             .sink(receiveValue: { [weak self] input in
@@ -42,19 +39,9 @@ class MessageListViewModel: ObservableObject {
             }).store(in: &disposeBag)
 
         let client = Network.shared.spaceEndpoint
-
-//        subscription = client.subscribe(subscription: ListenForMessagesSubscription()) { [weak self] result in
-//            guard let self = self else { return }
-//            switch result {
-//                case .success(let data):
-//                    guard let message = data.data?.postedMessages.fragments.messageFragment else { return }
-//                    self.messages.append(message)
-//                case .failure(_):
-//                    break
-//            }
-//        }
         client.publisher(for: ListenForMessagesSubscription())
-            .map({ $0?.postedMessages.fragments.messageFragment })
+            .asPureResult()
+            .map({ $0.postedMessages.fragments.messageFragment })
             .catch({ e -> Just<MessageFragment?> in
                 print("Detected an error with the messages... \(String(describing: e))")
                 return Just(nil)

@@ -217,7 +217,8 @@ class DataStore: ObservableObject {
 
     func listenToBookigs() -> AnyPublisher<String?, Never> {
         return backend.publisher(for: ListenToBookingsSubscription())
-            .map({ $0?.tripBooked.id })
+            .asPureResult()
+            .map({ $0.tripBooked.id })
             .catch({ _ -> Just<String?> in Just(nil) })
             .eraseToAnyPublisher()
     }
